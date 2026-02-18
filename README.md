@@ -20,6 +20,9 @@ This is ideal for debugging, learning, or analyzing complex Python applications.
 * Supports nested structures (modules, classes, instances, dicts, lists, etc.)
 * Recursively expands children up to a configurable depth
 * Provides search filtering to locate specific object paths
+* Yes, congenial-octo-spork was indeed randomly chosen by github!
+
+
 
 ---
 
