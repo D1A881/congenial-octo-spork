@@ -12,6 +12,7 @@ import sys
 import inspect
 import subprocess
 import tempfile
+from settings_window import SettingsWindow
 
 
 class ObjectBrowser:
@@ -29,6 +30,7 @@ class ObjectBrowser:
         
         # Load settings
         self.settings = settings or self.load_settings()
+        self.apply_settings()
         self.editor_command = self.settings.get('advanced', {}).get('editor_command', 'notepad {filename}')
 
         self.create_ui()
@@ -44,6 +46,57 @@ class ObjectBrowser:
                 pass
         return {'advanced': {'editor_command': 'notepad {filename}'}}
 
+def open_settings_window(self):
+    """Open settings window and bind save/apply behavior."""
+    # If already open, focus it
+    try:
+        if self.settings_win and self.settings_win.window.winfo_exists():
+            self.settings_win.window.lift()
+            return
+    except AttributeError:
+        pass
+
+    # Create and keep a ref
+    self.settings_win = SettingsWindow(parent=self.window, app_instance=self)
+
+    # Override save button to also apply settings on save
+    orig_save = self.settings_win.save_settings
+
+def reload_settings_data(self):
+    """Reload settings from file and reapply them."""
+    self.settings = self.load_settings()
+    self.apply_settings()
+    messagebox.showinfo("Settings Applied", "Settings updated and applied to Object Browser.")
+
+def apply_settings(self):
+    """Apply settings from self.settings to the layout editor."""
+    # Example: update editor command
+    self.editor_command = self.settings.get('editor', {}).get('editor_command', self.editor_command)
+
+    # Example: update tree recursion depth
+    try:
+        max_depth = int(self.settings.get('browser', {}).get('max_depth', 6))
+        self.max_depth = max_depth
+    except:
+        self.max_depth = 6
+
+    # Font size and theme could be applied here too,
+    #   e.g. changing fonts on tree/code widgets.
+
+    # (Add more as needed)
+
+    
+    def save_and_apply():
+        if orig_save():
+            # Reload settings in main app
+            self.settings = self.settings_win.settings
+            self.apply_settings()
+            self.reload_settings_data()
+
+    self.settings_win.save_settings = save_and_apply
+
+
+    
     def create_ui(self):
         """Create main UI"""
         # Top toolbar
@@ -82,7 +135,7 @@ class ObjectBrowser:
         ttk.Button(toolbar, text="📂 Load Code", command=self.load_code).pack(side=tk.LEFT, padx=2)
         
         ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, padx=5, fill=tk.Y)
-        ttk.Button(toolbar, text="⚙️ Settings", command=self.reload_settings).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar, text="⚙️ Settings", command=self.open_settings_window).pack(side=tk.LEFT, padx=2)
         
         # Title
         title_label = ttk.Label(toolbar, text="🧠 Object Browser", 
