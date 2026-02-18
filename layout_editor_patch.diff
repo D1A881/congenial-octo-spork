@@ -1,0 +1,93 @@
+diff --git a/layout_editor.py b/layout_editor.py
+index 1111111..2222222 100644
+--- a/layout_editor.py
++++ b/layout_editor.py
+@@ -1,6 +1,7 @@
+ import tkinter as tk
+ from tkinter import ttk, messagebox
+ import json
++from settings_window import SettingsWindow
+
+ class ObjectBrowser:
+
+@@ -25,7 +26,10 @@ class ObjectBrowser:
+         self.window = root
+         self.window.title("Layout Editor")
+
+-        self.settings = settings or self.load_settings()
++        self.settings = settings or self.load_settings()
++        self.settings_win = None
++
++        self.apply_settings()
+
+         self.create_ui()
+
+@@ -55,7 +59,7 @@ class ObjectBrowser:
+         toolbar = ttk.Frame(self.window)
+         toolbar.pack(fill=tk.X)
+
+-        ttk.Button(toolbar, text="⚙️ Settings", command=self.reload_settings).pack(side=tk.LEFT, padx=2)
++        ttk.Button(toolbar, text="⚙️ Settings", command=self.open_settings_window).pack(side=tk.LEFT, padx=2)
+
+     def load_settings(self):
+         try:
+@@ -65,6 +69,58 @@ class ObjectBrowser:
+             return {}
+
++    def open_settings_window(self):
++        """Open settings window and bind save/apply behavior."""
++
++        # If already open, focus it
++        if self.settings_win and self.settings_win.window.winfo_exists():
++            self.settings_win.window.lift()
++            return
++
++        # Create window
++        self.settings_win = SettingsWindow(parent=self.window, app_instance=self)
++
++        # Copy current settings into window
++        self.settings_win.settings = json.loads(json.dumps(self.settings))
++        self.settings_win.populate_tree()
++
++        # Wrap original save method
++        original_save = self.settings_win.save_settings
++
++        def save_and_apply():
++            if original_save():
++                self.settings = self.settings_win.settings
++                self.apply_settings()
++                self.reload_settings_data()
++            return True
++
++        self.settings_win.save_settings = save_and_apply
++
++    def apply_settings(self):
++        """Apply settings to layout editor."""
++
++        # Example: editor command
++        self.editor_command = self.settings.get(
++            "editor", {}
++        ).get("editor_command", getattr(self, "editor_command", "notepad"))
++
++        # Example: browser max depth
++        try:
++            self.max_depth = int(
++                self.settings.get("browser", {}).get("max_depth", 6)
++            )
++        except Exception:
++            self.max_depth = 6
++
++        # Extend this method to apply:
++        # - theme
++        # - font size
++        # - layout prefs
++
++    def reload_settings_data(self):
++        """Reload settings from file and reapply."""
++        self.settings = self.load_settings()
++        self.apply_settings()
++        messagebox.showinfo("Settings Applied", "Settings updated and applied.")
++
+     def reload_settings(self):
+         self.settings = self.load_settings()
+         messagebox.showinfo("Settings Reloaded", "Settings reloaded successfully.")
