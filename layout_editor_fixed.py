@@ -46,6 +46,11 @@ class ObjectBrowser:
                 pass
         return {'advanced': {'editor_command': 'notepad {filename}'}}
 
+def save_main_settings(self):
+    with open("settings.json", "w") as f:
+        json.dump(self.settings, f, indent=4)
+    messagebox.showinfo("Settings Saved", "Settings saved from main window.")
+
 def open_settings_window(self):
     """Open settings window and bind save/apply behavior."""
     # If already open, focus it
