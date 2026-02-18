@@ -8,7 +8,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, colorchooser
 import csv
 import json
-import os
+import os    
 
 
 class SettingsWindow:
@@ -29,6 +29,12 @@ class SettingsWindow:
         self.create_ui()
         self.populate_tree()
 
+def save_main_settings(self):
+    with open("settings.json", "w") as f:
+        json.dump(self.settings, f, indent=4)
+    messagebox.showinfo("Settings Saved", "Settings saved from main window.")
+
+    
     def load_settings(self):
         """Load settings from JSON file"""
         default_settings = {
