@@ -29,10 +29,10 @@ class SettingsWindow:
         self.create_ui()
         self.populate_tree()
 
-def save_main_settings(self):
-    with open("settings.json", "w") as f:
-        json.dump(self.settings, f, indent=4)
-    messagebox.showinfo("Settings Saved", "Settings saved from main window.")
+    def save_main_settings(self):
+        with open("settings.json", "w") as f:
+            json.dump(self.settings, f, indent=4)
+        messagebox.showinfo("Settings Saved", "Settings saved from main window.")
 
     
     def load_settings(self):
